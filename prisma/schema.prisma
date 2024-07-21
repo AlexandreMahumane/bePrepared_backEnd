@@ -13,23 +13,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model Province {
-  id String @id @default(uuid())
+  id          String     @id @default(uuid())
   designation String
-  createAt DateTime @default(now()) @map("create_at")
-  updateAt DateTime @updatedAt @map("update_at")
-  Districts District[]
+  createAt    DateTime   @default(now()) @map("create_at")
+  updateAt    DateTime   @updatedAt @map("update_at")
+  Districts   District[]
 
   @@map("province")
 }
 
 model District {
-  id String @id @default(uuid())
-  provinceId String @map("province_id")
+  id          String       @id @default(uuid())
+  provinceId  String       @map("province_id")
   designation String
-  createAt DateTime @default(now()) @map("create_at")
-  updateAt DateTime @updatedAt @map("update_at")
+  createAt    DateTime     @default(now()) @map("create_at")
+  updateAt    DateTime     @updatedAt @map("update_at")
   subscribers Subscriber[]
 
   province Province @relation(fields: [provinceId], references: [id])
@@ -38,16 +37,38 @@ model District {
 }
 
 model Subscriber {
-  id String @id @default(uuid())
-  phone String @unique @db.VarChar(9)
-  deviceId String? @map("device_id")
-  verified Boolean @default(false)
-  districtId String @map("district_id")
-  provinceId String @map("province_id")
-  createAt DateTime @default(now()) @map("create_at")
-  updateAt DateTime @updatedAt @map("update_at")
-  district District @relation(fields: [districtId] , references: [id])
+  id           String         @id @default(uuid())
+  phone        String         @unique @db.VarChar(9)
+  deviceId     String?        @unique @map("device_id")
+  verified     Boolean        @default(false)
+  districtId   String         @map("district_id")
+  provinceId   String         @map("province_id")
+  createAt     DateTime       @default(now()) @map("create_at")
+  updateAt     DateTime       @updatedAt @map("update_at")
+  district     District       @relation(fields: [districtId], references: [id])
+  Notification Notification[]
 
   @@map("subscriber")
+}
 
+model Notification {
+  id           String     @id @default(uuid())
+  subscriberId String     @map("subscriber_id")
+  message      String
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updateAt     DateTime   @updatedAt @map("update_at")
+  subscriber   Subscriber @relation(fields: [subscriberId], references: [id])
+
+  @@map("notification")
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now()) @map("created_at")
+  updateAt  DateTime @updatedAt @map("update_at")
+
+  @@map("admin")
 }

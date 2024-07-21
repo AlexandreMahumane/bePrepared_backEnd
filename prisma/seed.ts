@@ -226,8 +226,8 @@ export async function seeds(){
         Districts:{
             create: province.districts.map(district => 
             ({
-                designation: district
-            }))  
+                designation: district 
+            }))
 
         }
     }

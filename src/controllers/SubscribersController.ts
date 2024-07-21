@@ -2,6 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { generate6DigtsNumber } from "../utils/utils";
 import { db } from "../database";
 import { z } from "zod";
+import { redis } from "../database/redis";
 
 
 export class SubscribersController {
@@ -44,11 +45,11 @@ export class SubscribersController {
 
         const otp = generate6DigtsNumber();
         console.log(otp);
-            console.log(saveSubscriber)
+        await redis.set(`otp_${otp}`, phone, 60 * 3);
+
         return reply.status(201).send(
             {
-                subscriber:saveSubscriber,
-                otp
+                subscriber:saveSubscriber
             }
         )
     }
