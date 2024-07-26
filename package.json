@@ -24,7 +24,11 @@
   "dependencies": {
     "@prisma/client": "^5.16.2",
     "bcrypt": "^5.1.1",
+    "dayjs": "^1.11.12",
+    "dotenv": "^16.4.5",
     "fastify": "^4.28.1",
+    "firebase": "^10.12.4",
+    "firebase-admin": "^12.3.0",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.10.3",
     "redis": "^4.6.15",

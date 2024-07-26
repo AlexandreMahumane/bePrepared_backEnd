@@ -3,7 +3,8 @@ import { SubscribersController } from "../controllers/SubscribersController";
 import { AuthController } from "../controllers/AuthController";
 import { NotificationController } from "../controllers/NotificationController";
 import { AdminController } from "../controllers/AdminController";
-import { alertsController } from "../controllers/AlertsController";
+import { AlertsController } from "../controllers/AlertsController";
+import { AuthHook } from "../hooks/Auth";
 
 const subscribersController = new SubscribersController();
 const authController = new AuthController();
@@ -28,5 +29,6 @@ export const  routes = async (fastify: FastifyInstance) =>{
     fastify.post('/login/admin', (request, reply)=> adminController.login(request, reply) )
     
     
-    fastify.post('/alerts', (request, reply)=> alertsController.create(request, reply) )
+    fastify.post('/alerts',{preHandler: AuthHook} ,(request, reply)=> alertsController.create(request, reply) )
+    fastify.get('/alerts',(request, reply)=> alertsController.list(request, reply) )
 }

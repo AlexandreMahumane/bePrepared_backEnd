@@ -1,7 +1,8 @@
 import { FastifyError, FastifyReply, FastifyRequest } from "fastify";
-import { jwt } from 'jsonwebtoken'
+import  jwt  from 'jsonwebtoken'
 import { z } from "zod";
-import { TokenConfig } from "../config/TokenConfig.ts";
+import { TokenConfig } from "../config/TokenConfig";
+
 
 export function AuthHook(request: FastifyRequest, reply: FastifyReply, done: (error?: FastifyError) => void){
     const [,token] =z.string().parse(request.headers.authorization);
