@@ -3,6 +3,7 @@ import { string, z } from "zod";
 import { db } from "../database";
 import { getMessaging } from 'firebase-admin/messaging'
 import dayjs from "dayjs";
+import { messageService } from "../utils/twilio";
 
 
 export class AlertsController{
@@ -16,7 +17,7 @@ export class AlertsController{
     });
 
     const { title, message, provinceId, districtId } = alertSchema.parse(request.body);
-
+console.log("check district")
     const district = await db.district.findUnique({
         where: {
             id: districtId, 
@@ -27,10 +28,11 @@ export class AlertsController{
     if(!district) {
         return reply.status(400).send({error: "District doesn't belong to the province"})
     }
-
-    const subscriberDeviceId = await db.subscriber.findMany({
+    console.log("check subscriber")
+    const subscriber = await db.subscriber.findMany({
         select: {
-            deviceId: true
+            deviceId: true,
+            phone: true
         },
 
         where: {
@@ -45,12 +47,7 @@ export class AlertsController{
 
     
 
-    const registrationTokens = [
-        'YOUR_REGISTRATION_TOKEN_1',
-        // …
-        'YOUR_REGISTRATION_TOKEN_N',
-      ];
-
+    console.log("save alert")
 
     const alert = await db.alerts.create({
         data: {
@@ -67,8 +64,14 @@ export class AlertsController{
             districtId: true
         }
     })
+console.log("twilio working")
 
-    const tokens = subscriberDeviceId.map(e => String(e.deviceId));
+   const text = `Alert\nTitle: ${alert.title}\nMessage: ${alert.message}`
+    subscriber.forEach(subscriber => {
+        console.log(subscriber.phone)
+        messageService(text, subscriber.phone)
+    })
+    const tokens = subscriber.map(e => String(e.deviceId));
 
     const alertmessage = {
         data: alert,
@@ -102,7 +105,6 @@ async list(request: FastifyRequest, reply: FastifyReply){
     const { provinceId, districtId, page = 0 } = querySchema.parse(request.query);
 
     const alerts = db.alerts.findMany({
-
         where: {
             provinceId,
             districtId,
@@ -110,8 +112,6 @@ async list(request: FastifyRequest, reply: FastifyReply){
                 gte: dayjs().subtract(28, 'day').format()
             }
         },
-
-
         include: {
             province: true,
             district: true

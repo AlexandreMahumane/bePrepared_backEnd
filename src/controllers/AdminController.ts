@@ -3,7 +3,8 @@ import { z } from "zod";
 import { db } from "../database";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { TokenConfig } from "../config/TokenConfig.ts";
+import { TokenConfig } from "../config/TokenConfig";
+
 
 
 export class AdminController{
@@ -72,4 +73,9 @@ export class AdminController{
     return reply.status(200).send({token, 
         admin: {...admin, password:undefined}})
 }
+
+    async list(request: FastifyRequest, reply: FastifyReply){
+
+        reply.send()
+    }
 }

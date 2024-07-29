@@ -3,6 +3,7 @@ import { generate6DigtsNumber } from "../utils/utils";
 import { db } from "../database";
 import { z } from "zod";
 import { redis } from "../database/redis";
+import { messageService } from "../utils/twilio";
 
 
 export class SubscribersController {
@@ -34,6 +35,10 @@ export class SubscribersController {
             return reply.status(400).send({error: "District doesn't belong to the province"})
         }
 
+        const otp = generate6DigtsNumber();
+        console.log(otp);
+        await redis.set(`otp_${otp}`, phone, 60 * 3);
+
         // save in database
         const saveSubscriber = await db.subscriber.create({ 
             data: {
@@ -43,9 +48,7 @@ export class SubscribersController {
             } 
             });
 
-        const otp = generate6DigtsNumber();
-        console.log(otp);
-        await redis.set(`otp_${otp}`, phone, 60 * 3);
+            messageService(`The otp code to check your account is ${otp}`, phone)
 
         return reply.status(201).send(
             {
